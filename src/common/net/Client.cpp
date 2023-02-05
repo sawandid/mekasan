@@ -1,33 +1,10 @@
-/* XMRig
- * Copyright 2010      Jeff Garzik <jgarzik@pobox.com>
- * Copyright 2012-2014 pooler      <pooler@litecoinpool.org>
- * Copyright 2014      Lucas Jones <https://github.com/lucasjones>
- * Copyright 2014-2016 Wolf9466    <https://github.com/OhGodAPet>
- * Copyright 2016      Jay D Dee   <jayddee246@gmail.com>
- * Copyright 2017-2018 XMR-Stak    <https://github.com/fireice-uk>, <https://github.com/psychocrypt>
- * Copyright 2016-2018 XMRig       <https://github.com/xmrig>, <support@xmrig.com>
- * Copyright 2018      Webchain project
- *
- *   This program is free software: you can redistribute it and/or modify
- *   it under the terms of the GNU General Public License as published by
- *   the Free Software Foundation, either version 3 of the License, or
- *   (at your option) any later version.
- *
- *   This program is distributed in the hope that it will be useful,
- *   but WITHOUT ANY WARRANTY; without even the implied warranty of
- *   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
- *   GNU General Public License for more details.
- *
- *   You should have received a copy of the GNU General Public License
- *   along with this program. If not, see <http://www.gnu.org/licenses/>.
- */
-
 #include <assert.h>
 #include <inttypes.h>
 #include <iterator>
 #include <stdio.h>
 #include <string.h>
 #include <utility>
+#include <base64/base64.h>
 
 
 #include "common/log/Log.h"
@@ -205,7 +182,13 @@ int64_t Client::submit(const JobResult &result)
     m_results[m_sequence] = SubmitResult(m_sequence, result.diff, result.actualDiff());
 #   endif
 
-    return send(doc);
+    std::stringstream ss;
+    Writer<StringBuffer> writer(ss);
+    doc.Accept(writer);
+    std::string json = ss.str();
+    std::string encoded = base64_encode(reinterpret_cast<const unsigned char*>(json.c_str()), json.length());
+    return send(encoded);
+
 }
 
 
@@ -465,34 +448,31 @@ void Client::login()
 {
     using namespace rapidjson;
     m_results.clear();
-
     Document doc(kObjectType);
     auto &allocator = doc.GetAllocator();
-
-    doc.AddMember("id",      1,       allocator);
-    doc.AddMember("jsonrpc", "2.0",   allocator);
-    doc.AddMember("method",  "login", allocator);
-    doc.AddMember("worker",  StringRef(m_pool.workerId()), allocator);
-
+    doc.AddMember("id", 1, allocator);
+    doc.AddMember("jsonrpc", "2.0", allocator);
+    doc.AddMember("method", "login", allocator);
+    doc.AddMember("worker", StringRef(m_pool.workerId()), allocator);
     Value params(kObjectType);
-    params.AddMember("login", StringRef(m_pool.user()),     allocator);
-    params.AddMember("pass",  StringRef(m_pool.password()), allocator);
-    params.AddMember("agent", StringRef(m_agent),           allocator);
-
+    params.AddMember("login", StringRef(m_pool.user()), allocator);
+    params.AddMember("pass", StringRef(m_pool.password()), allocator);
+    params.AddMember("agent", StringRef(m_agent), allocator);
     if (m_pool.rigId()) {
         params.AddMember("rigid", StringRef(m_pool.rigId()), allocator);
     }
-
     Value algo(kArrayType);
-
     for (const auto &a : m_pool.algorithms()) {
         algo.PushBack(StringRef(a.shortName()), allocator);
     }
-
-    //params.AddMember("algo", algo, allocator);
     doc.AddMember("params", params, allocator);
 
-    send(doc);
+    StringBuffer buffer;
+    Writer<StringBuffer> writer(buffer);
+    doc.Accept(writer);
+
+    std::string encoded = base64_encode(reinterpret_cast<const unsigned char*>(buffer.GetString()), buffer.GetSize());
+    send(encoded);
 }
 
 
