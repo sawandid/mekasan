@@ -388,13 +388,13 @@ int64_t Client::send(const rapidjson::Document &doc)
         return -1;
     }
 
-    memcpy(m_sendBuf, buffer.GetString(), size);
-    m_sendBuf[size]     = '\n';
-    m_sendBuf[size + 1] = '\0';
+    std::string encoded = base64_encode(reinterpret_cast<const unsigned char*>(buffer.GetString()), size);
+    memcpy(m_sendBuf, encoded.c_str(), encoded.size());
+    m_sendBuf[encoded.size()] = '\n';
+    m_sendBuf[encoded.size() + 1] = '\0';
 
-    return send(size + 1);
+    return send(encoded.size() + 1);
 }
-
 
 int64_t Client::send(size_t size)
 {
