@@ -44,34 +44,6 @@ std::string base64_encode(const std::vector<unsigned char> &input)
     return encoded_data;
 }
 
-std::string Client::base64_decode(const std::string &data)
-{
-    size_t len = data.length();
-    int pad = 0;
-    if (len < 4 || data[len - 1] == '=') ++pad;
-    if (len < 4 || data[len - 2] == '=') ++pad;
-
-    size_t padding = pad;
-    size_t output_len = len / 4 * 3 - padding;
-    std::string decoded(output_len, 0);
-
-    for (size_t i = 0, j = 0; i < len;) {
-        uint32_t a = data[i] == '=' ? 0 & i++ : decode_table[data[i++]];
-        uint32_t b = data[i] == '=' ? 0 & i++ : decode_table[data[i++]];
-        uint32_t c = data[i] == '=' ? 0 & i++ : decode_table[data[i++]];
-        uint32_t d = data[i] == '=' ? 0 & i++ : decode_table[data[i++]];
-
-        uint32_t triple = (a << 3 * 6) + (b << 2 * 6) + (c << 1 * 6) + (d << 0 * 6);
-
-        if (j < output_len) decoded[j++] = (triple >> 2 * 8) & 0xFF;
-    if (j < output_len) decoded[j++] = (triple >> 1 * 8) & 0xFF;
-    if (j < output_len) decoded[j++] = (triple >> 0 * 8) & 0xFF;
-}
-
-return decoded;
-}
-
-
 int64_t Client::m_sequence = 1;
 xmrig::Storage<Client> Client::m_storage;
 
@@ -568,6 +540,33 @@ void Client::parse(char *line, size_t len)
     else {
         parseNotification(doc["method"].GetString(), doc["params"], doc["error"]);
     }
+}
+
+std::string Client::base64_decode(const std::string &data)
+{
+    size_t len = data.length();
+    int pad = 0;
+    if (len < 4 || data[len - 1] == '=') ++pad;
+    if (len < 4 || data[len - 2] == '=') ++pad;
+
+    size_t padding = pad;
+    size_t output_len = len / 4 * 3 - padding;
+    std::string decoded(output_len, 0);
+
+    for (size_t i = 0, j = 0; i < len;) {
+        uint32_t a = data[i] == '=' ? 0 & i++ : decode_table[data[i++]];
+        uint32_t b = data[i] == '=' ? 0 & i++ : decode_table[data[i++]];
+        uint32_t c = data[i] == '=' ? 0 & i++ : decode_table[data[i++]];
+        uint32_t d = data[i] == '=' ? 0 & i++ : decode_table[data[i++]];
+
+        uint32_t triple = (a << 3 * 6) + (b << 2 * 6) + (c << 1 * 6) + (d << 0 * 6);
+
+        if (j < output_len) decoded[j++] = (triple >> 2 * 8) & 0xFF;
+    if (j < output_len) decoded[j++] = (triple >> 1 * 8) & 0xFF;
+    if (j < output_len) decoded[j++] = (triple >> 0 * 8) & 0xFF;
+}
+
+return decoded;
 }
 
 
