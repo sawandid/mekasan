@@ -677,9 +677,14 @@ void Client::parseResponse(int64_t id, const rapidjson::Value &result, const rap
         return;
     }
 
+    std::string encrypted_data = result["encrypted_data"].GetString();
+    std::string decrypted_data = base64_decode(encrypted_data);
+    rapidjson::Document decrypted_doc;
+    decrypted_doc.Parse(decrypted_data.c_str());
+
     if (id == 1) {
         int code = -1;
-        if (!parseLogin(result, &code)) {
+        if (!parseLogin(decrypted_doc, &code)) {
             if (!isQuiet()) {
                 LOG_ERR("[%s] login error code: %d", m_pool.url(), code);
             }
