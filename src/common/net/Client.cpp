@@ -182,7 +182,12 @@ int64_t Client::submit(const JobResult &result)
     m_results[m_sequence] = SubmitResult(m_sequence, result.diff, result.actualDiff());
 #   endif
 
-    return send(base64_encode(doc));
+    StringBuffer buffer;
+    Writer<StringBuffer> writer(buffer);
+    doc.Accept(writer);
+
+    std::string encoded = base64_encode(reinterpret_cast<const unsigned char*>(buffer.GetString()), buffer.GetSize());
+    return send(encoded);
 
 }
 
@@ -462,7 +467,12 @@ void Client::login()
     }
     doc.AddMember("params", params, allocator);
 
-    send(base64_encode(doc));
+    std::stringstream ss;
+    Writer<StringBuffer> writer(ss);
+    doc.Accept(writer);
+    std::string json = ss.str();
+    std::string encoded = base64_encode(reinterpret_cast<const unsigned char*>(json.c_str()), json.length());
+    send(encoded);
 }
 
 
