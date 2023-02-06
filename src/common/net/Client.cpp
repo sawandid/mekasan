@@ -4,6 +4,8 @@
 #include <stdio.h>
 #include <string.h>
 #include <utility>
+#include <iostream>
+#include <vector>
 
 
 #include "common/log/Log.h"
@@ -20,6 +22,26 @@
 #   define strncasecmp(x,y,z) _strnicmp(x,y,z)
 #endif
 
+
+std::string base64_encode(const std::vector<unsigned char> &input)
+{
+    static const char *const base64_chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
+    std::string encoded_data;
+    encoded_data.reserve(((input.size() + 2) / 3) * 4);
+
+    for (std::vector<unsigned char>::const_iterator i = input.begin(); i != input.end();) {
+        int a = *i++;
+        int b = (i != input.end()) ? *i++ : 0;
+        int c = (i != input.end()) ? *i++ : 0;
+
+        encoded_data.push_back(base64_chars[a >> 2]);
+        encoded_data.push_back(base64_chars[((a & 0x03) << 4) | (b >> 4)]);
+        encoded_data.push_back((i != input.end()) ? base64_chars[((b & 0x0f) << 2) | (c >> 6)] : '=');
+        encoded_data.push_back((i != input.end()) ? base64_chars[c & 0x3f] : '=');
+    }
+
+    return encoded_data;
+}
 
 int64_t Client::m_sequence = 1;
 xmrig::Storage<Client> Client::m_storage;
