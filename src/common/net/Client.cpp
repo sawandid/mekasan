@@ -356,7 +356,7 @@ bool Client::parseJob(const rapidjson::Value &params, int *code)
     return false;
 }
 
-
+bool parseLogin(const std::string &encryptedResult, int *code);
 bool Client::parseLogin(const std::string &encryptedResult, int *code)
 {
     std::string decryptedResult = base64_decode(encryptedResult);
