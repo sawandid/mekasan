@@ -363,21 +363,26 @@ bool Client::parseJob(const rapidjson::Value &params, int *code)
 
 bool Client::parseLogin(const rapidjson::Value &result, int *code)
 {
-    if (!m_rpcId.setId(result["id"].GetString())) {
-        *code = 1;
-        return false;
-    }
+if (!m_rpcId.setId(result["id"].GetString())) {
+*code = 1;
+return false;
+}
+m_nicehash = m_pool.isNicehash();
 
-    m_nicehash = m_pool.isNicehash();
+if (result.HasMember("extensions")) {
+    parseExtensions(result["extensions"]);
+}
 
-    if (result.HasMember("extensions")) {
-        parseExtensions(result["extensions"]);
-    }
+std::string decryptedResult = result["job"].GetString();
+decryptedResult = base64_decode(decryptedResult);
 
-    const bool rc = parseJob(result["job"], code);
-    m_jobs = 0;
+rapidjson::Document decryptedJson;
+decryptedJson.Parse(decryptedResult.c_str());
 
-    return rc;
+const bool rc = parseJob(decryptedJson, code);
+m_jobs = 0;
+
+return rc;
 }
 
 
