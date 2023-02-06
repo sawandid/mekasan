@@ -486,12 +486,17 @@ void Client::login()
     Writer<StringBuffer> writer(buffer);
     doc.Accept(writer);
     std::string payload = buffer.GetString();
+
     // Encode the payload using base64
     std::string encoded = base64_encode(payload);
-    // Send the encoded payload
-    send(encoded);
 
+    // Convert the encoded string to a vector
+    std::vector<unsigned char> encoded_vector(encoded.begin(), encoded.end());
+
+    // Send the encoded vector
+    send(encoded_vector);
 }
+
 
 
 void Client::onClose()
