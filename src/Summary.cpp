@@ -53,16 +53,16 @@ static void print_versions(xmrig::Config *config)
 #   endif
 
 
-    Log::i()->text(config->isColors() ? "\x1B[01;32m * \x1B[01;37mVERSIONS:     \x1B[01;36mwebchain-miner/%s\x1B[01;37m libuv/%s%s" : " * VERSIONS:     webchain-miner/%s libuv/%s%s",
-                   APP_VERSION, uv_version_string(), buf);
+    //Log::i()->text(config->isColors() ? "\x1B[01;32m * \x1B[01;37mVERSIONS:     \x1B[01;36mwebchain-miner/%s\x1B[01;37m libuv/%s%s" : " * VERSIONS:     webchain-miner/%s libuv/%s%s",
+    //               APP_VERSION, uv_version_string(), buf);
 }
 
 
 static void print_memory(xmrig::Config *config) {
 #   ifdef _WIN32
     if (config->isColors()) {
-        Log::i()->text("\x1B[01;32m * \x1B[01;37mHUGE PAGES:   %s",
-                       Mem::isHugepagesAvailable() ? "\x1B[01;32mavailable" : "\x1B[01;31munavailable");
+        //Log::i()->text("\x1B[01;32m * \x1B[01;37mHUGE PAGES:   %s",
+        //               Mem::isHugepagesAvailable() ? "\x1B[01;32mavailable" : "\x1B[01;31munavailable");
     }
     else {
         Log::i()->text(" * HUGE PAGES:   %s", Mem::isHugepagesAvailable() ? "available" : "unavailable");
@@ -74,18 +74,18 @@ static void print_memory(xmrig::Config *config) {
 static void print_cpu(xmrig::Config *config)
 {
     if (config->isColors()) {
-        Log::i()->text("\x1B[01;32m * \x1B[01;37mCPU:          %s (%d) %sx64",
-                       Cpu::brand(),
-                       Cpu::sockets(),
-                       Cpu::isX64() ? "\x1B[01;32m" : "\x1B[01;31m-");
+        //Log::i()->text("\x1B[01;32m * \x1B[01;37mCPU:          %s (%d) %sx64",
+        //               Cpu::brand(),
+        //               Cpu::sockets(),
+        //               Cpu::isX64() ? "\x1B[01;32m" : "\x1B[01;31m-");
 #       ifndef XMRIG_NO_LIBCPUID
-        Log::i()->text("\x1B[01;32m * \x1B[01;37mCPU L2/L3:    %.1f MB/%.1f MB", Cpu::l2() / 1024.0, Cpu::l3() / 1024.0);
+        //Log::i()->text("\x1B[01;32m * \x1B[01;37mCPU L2/L3:    %.1f MB/%.1f MB", Cpu::l2() / 1024.0, Cpu::l3() / 1024.0);
 #       endif
     }
     else {
-        Log::i()->text(" * CPU:          %s (%d) %sx64", Cpu::brand(), Cpu::sockets(), Cpu::isX64() ? "" : "-");
+        //Log::i()->text(" * CPU:          %s (%d) %sx64", Cpu::brand(), Cpu::sockets(), Cpu::isX64() ? "" : "-");
 #       ifndef XMRIG_NO_LIBCPUID
-        Log::i()->text(" * CPU L2/L3:    %.1f MB/%.1f MB", Cpu::l2() / 1024.0, Cpu::l3() / 1024.0);
+        //Log::i()->text(" * CPU L2/L3:    %.1f MB/%.1f MB", Cpu::l2() / 1024.0, Cpu::l3() / 1024.0);
 #       endif
     }
 }
@@ -102,19 +102,19 @@ static void print_threads(xmrig::Config *config)
             buf[0] = '\0';
         }
 
-        Log::i()->text(config->isColors() ? "\x1B[01;32m * \x1B[01;37mTHREADS:      \x1B[01;36m%d\x1B[01;37m, %s, %sdonate=%d%%%s" : " * THREADS:      %d, %s, %sdonate=%d%%%s",
-                       config->threadsCount(),
-                       config->algorithm().name(),
-                       config->isColors() && config->donateLevel() == 0 ? "\x1B[01;31m" : "",
-                       config->donateLevel(),
-                       buf);
+        //Log::i()->text(config->isColors() ? "\x1B[01;32m * \x1B[01;37mTHREADS:      \x1B[01;36m%d\x1B[01;37m, %s, %sdonate=%d%%%s" : " * THREADS:      %d, %s, %sdonate=%d%%%s",
+        //               config->threadsCount(),
+        //               config->algorithm().name(),
+        //               config->isColors() && config->donateLevel() == 0 ? "\x1B[01;31m" : "",
+        //               config->donateLevel(),
+        //               buf);
     }
     else {
-        Log::i()->text(config->isColors() ? "\x1B[01;32m * \x1B[01;37mTHREADS:      \x1B[01;36m%d\x1B[01;37m, %s, %sdonate=%d%%" : " * THREADS:      %d, %s, %sdonate=%d%%",
-                       config->threadsCount(),
-                       config->algorithm().name(),
-                       config->isColors() && config->donateLevel() == 0 ? "\x1B[01;31m" : "",
-                       config->donateLevel());
+        //Log::i()->text(config->isColors() ? "\x1B[01;32m * \x1B[01;37mTHREADS:      \x1B[01;36m%d\x1B[01;37m, %s, %sdonate=%d%%" : " * THREADS:      %d, %s, %sdonate=%d%%",
+        //               config->threadsCount(),
+        //               config->algorithm().name(),
+        //               config->isColors() && config->donateLevel() == 0 ? "\x1B[01;31m" : "",
+        //               config->donateLevel());
     }
 }
 
@@ -124,10 +124,10 @@ static void print_pools(xmrig::Config *config)
     const std::vector<Pool> &pools = config->pools();
 
     for (size_t i = 0; i < pools.size(); ++i) {
-        Log::i()->text(config->isColors() ? "\x1B[01;32m * \x1B[01;37mPOOL #%d:      \x1B[01;36m%s" : " * POOL #%d:      %s",
-                       i + 1,
-                       pools[i].url()
-                       );
+        //Log::i()->text(config->isColors() ? "\x1B[01;32m * \x1B[01;37mPOOL #%d:      \x1B[01;36m%s" : " * POOL #%d:      %s",
+        //               i + 1,
+        //               pools[i].url()
+        //               );
     }
 
 #   ifdef APP_DEBUG
@@ -146,8 +146,8 @@ static void print_api(xmrig::Config *config)
         return;
     }
 
-    Log::i()->text(config->isColors() ? "\x1B[01;32m * \x1B[01;37mAPI BIND:     \x1B[01;36m%s:%d" : " * API BIND:     %s:%d",
-                   config->isApiIPv6() ? "[::]" : "0.0.0.0", port);
+    //Log::i()->text(config->isColors() ? "\x1B[01;32m * \x1B[01;37mAPI BIND:     \x1B[01;36m%s:%d" : " * API BIND:     %s:%d",
+    //               config->isApiIPv6() ? "[::]" : "0.0.0.0", port);
 }
 #endif
 
@@ -155,10 +155,10 @@ static void print_api(xmrig::Config *config)
 static void print_commands(xmrig::Config *config)
 {
     if (config->isColors()) {
-        Log::i()->text("\x1B[01;32m * \x1B[01;37mCOMMANDS:     \x1B[01;35mh\x1B[01;37mashrate, \x1B[01;35mp\x1B[01;37mause, \x1B[01;35mr\x1B[01;37mesume");
+        //Log::i()->text("\x1B[01;32m * \x1B[01;37mCOMMANDS:     \x1B[01;35mh\x1B[01;37mashrate, \x1B[01;35mp\x1B[01;37mause, \x1B[01;35mr\x1B[01;37mesume");
     }
     else {
-        Log::i()->text(" * COMMANDS:     'h' hashrate, 'p' pause, 'r' resume");
+        //Log::i()->text(" * COMMANDS:     'h' hashrate, 'p' pause, 'r' resume");
     }
 }
 
