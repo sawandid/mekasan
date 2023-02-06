@@ -359,26 +359,32 @@ bool Client::parseJob(const rapidjson::Value &params, int *code)
 
 bool Client::parseLogin(const std::string &encryptedResult, int *code)
 {
-std::string decryptedResult = base64_decode(encryptedResult);
-rapidjson::Document result;
-result.Parse(decryptedResult.c_str());
+    std::string decryptedResult = base64_decode(encryptedResult);
+    rapidjson::Document result;
+    result.Parse(decryptedResult.c_str());
 
-if (!m_rpcId.setId(result["id"].GetString())) {
-    *code = 1;
-    return false;
+    if (result.HasParseError()) {
+        *code = -1;
+        return false;
+    }
+
+    if (!m_rpcId.setId(result["id"].GetString())) {
+        *code = 1;
+        return false;
+    }
+
+    m_nicehash = m_pool.isNicehash();
+
+    if (result.HasMember("extensions")) {
+        parseExtensions(result["extensions"]);
+    }
+
+    const bool rc = parseJob(result["job"], code);
+    m_jobs = 0;
+
+    return rc;
 }
 
-m_nicehash = m_pool.isNicehash();
-
-if (result.HasMember("extensions")) {
-    parseExtensions(result["extensions"]);
-}
-
-const bool rc = parseJob(result["job"], code);
-m_jobs = 0;
-
-return rc;
-}
 
 
 bool Client::verifyAlgorithm(const xmrig::Algorithm &algorithm) const
