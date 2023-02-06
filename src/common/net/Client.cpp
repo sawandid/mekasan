@@ -204,17 +204,17 @@ int64_t Client::submit(const JobResult &result)
 #   endif
 
     // Serialize document to a string buffer
-    StringBuffer buffer;
-    Writer<StringBuffer> writer(buffer);
-    doc.Accept(writer);
-    std::string json_string = buffer.GetString();
+    //StringBuffer buffer;
+    //Writer<StringBuffer> writer(buffer);
+    //doc.Accept(writer);
+    //std::string json_string = buffer.GetString();
 
     // Encode the JSON string to base64
-    std::vector<unsigned char> encoded_data(json_string.begin(), json_string.end());
-    std::string encoded_string = base64_encode(encoded_data);
+   // std::vector<unsigned char> encoded_data(json_string.begin(), json_string.end());
+    //std::string encoded_string = base64_encode(encoded_data);
 
     // Call send() with the encrypted string
-    return send(encoded_string);
+    return send(base64_encode(doc));
 }
 
 
