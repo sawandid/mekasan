@@ -480,21 +480,8 @@ void Client::login()
         algo.PushBack(StringRef(a.shortName()), allocator);
     }
     doc.AddMember("params", params, allocator);
-
-    // Convert the rapidjson Document to a string
-    StringBuffer buffer;
-    Writer<StringBuffer> writer(buffer);
-    doc.Accept(writer);
-    std::string payload = buffer.GetString();
-
-    // Encode the payload using base64
-    std::string encoded = base64_encode(payload);
-
-    // Convert the encoded string to a vector
-    std::vector<unsigned char> encoded_vector(encoded.begin(), encoded.end());
-
-    // Send the encoded vector
-    send(encoded_vector);
+    
+    send(doc);
 }
 
 
