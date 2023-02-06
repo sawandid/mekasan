@@ -14,7 +14,6 @@
 #include "rapidjson/error/en.h"
 #include "rapidjson/stringbuffer.h"
 #include "rapidjson/writer.h"
-#include "base64/base64.h"
 
 
 #ifdef _MSC_VER
