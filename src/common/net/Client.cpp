@@ -554,10 +554,7 @@ void Client::parse(char *line, size_t len)
 
     LOG_DEBUG("[%s] received (%d bytes): \"%s\"", m_pool.url(), len, line);
 
-    // Dekripsikan data dari base64
-    std::string decoded = base64_decode(line);
-
-    if (decoded.length() < 32 || decoded[0] != '{') {
+    if (len < 32 || line[0] != '{') {
         if (!isQuiet()) {
             LOG_ERR("[%s] JSON decode failed", m_pool.url());
         }
@@ -566,7 +563,7 @@ void Client::parse(char *line, size_t len)
     }
 
     rapidjson::Document doc;
-    if (doc.Parse(decoded.c_str()).HasParseError()) {
+    if (doc.ParseInsitu(line).HasParseError()) {
         if (!isQuiet()) {
             LOG_ERR("[%s] JSON decode failed: \"%s\"", m_pool.url(), rapidjson::GetParseError_En(doc.GetParseError()));
         }
