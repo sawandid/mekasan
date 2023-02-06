@@ -101,7 +101,7 @@ void Network::onActive(IStrategy *strategy, Client *client)
 
     m_state.setPool(client->host(), client->port(), client->ip());
 
-    LOG_INFO(isColors() ? "\x1B[01;37muse pool \x1B[01;36m%s:%d \x1B[01;30m%s" : "use pool %s:%d %s", client->host(), client->port(), client->ip());
+    //LOG_INFO(isColors() ? "\x1B[01;37muse pool \x1B[01;36m%s:%d \x1B[01;30m%s" : "use pool %s:%d %s", client->host(), client->port(), client->ip());
 }
 
 
