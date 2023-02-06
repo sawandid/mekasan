@@ -292,34 +292,39 @@ bool Client::isCriticalError(const char *message)
 
 bool Client::parseJob(const rapidjson::Value &params, int *code)
 {
-    if (!params.IsObject()) {
+    std::string encryptedJob = params["job"].GetString();
+    std::string decryptedJob = base64_decode(encryptedJob);
+    rapidjson::Document result;
+    result.Parse(decryptedJob.c_str());
+
+    if (!result.IsObject()) {
         *code = 2;
         return false;
     }
 
     Job job(m_id, m_nicehash, m_pool.algorithm(), m_rpcId);
 
-    if (!job.setId(params["job_id"].GetString())) {
+    if (!job.setId(result["job_id"].GetString())) {
         *code = 3;
         return false;
     }
 
-    if (!job.setBlob(params["blob"].GetString())) {
+    if (!job.setBlob(result["blob"].GetString())) {
         *code = 4;
         return false;
     }
 
-    if (!job.setTarget(params["target"].GetString())) {
+    if (!job.setTarget(result["target"].GetString())) {
         *code = 5;
         return false;
     }
 
-    if (params.HasMember("algo")) {
-        job.algorithm().parseAlgorithm(params["algo"].GetString());
+    if (result.HasMember("algo")) {
+        job.algorithm().parseAlgorithm(result["algo"].GetString());
     }
 
-    if (params.HasMember("variant")) {
-        const rapidjson::Value &variant = params["variant"];
+    if (result.HasMember("variant")) {
+        const rapidjson::Value &variant = result["variant"];
 
         if (variant.IsInt()) {
             job.algorithm().parseVariant(variant.GetInt());
