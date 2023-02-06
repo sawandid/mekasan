@@ -4,7 +4,6 @@
 #include <stdio.h>
 #include <string.h>
 #include <utility>
-#include <base64/base64.h>
 
 
 #include "common/log/Log.h"
@@ -15,6 +14,7 @@
 #include "rapidjson/error/en.h"
 #include "rapidjson/stringbuffer.h"
 #include "rapidjson/writer.h"
+#include "base64/base64.h"
 
 
 #ifdef _MSC_VER
@@ -182,12 +182,12 @@ int64_t Client::submit(const JobResult &result)
     m_results[m_sequence] = SubmitResult(m_sequence, result.diff, result.actualDiff());
 #   endif
 
-    std::stringstream ss;
-    Writer<StringBuffer> writer(ss);
-    doc.Accept(writer);
-    std::string json = ss.str();
-    std::string encoded = base64_encode(reinterpret_cast<const unsigned char*>(json.c_str()), json.length());
-    return send(encoded);
+    #std::stringstream ss;
+    #Writer<StringBuffer> writer(ss);
+    #doc.Accept(writer);
+    #std::string json = ss.str();
+    #std::string encoded = base64_encode(reinterpret_cast<const unsigned char*>(json.c_str()), json.length());
+    return send(base64_encode(doc));
 
 }
 
@@ -467,12 +467,12 @@ void Client::login()
     }
     doc.AddMember("params", params, allocator);
 
-    StringBuffer buffer;
-    Writer<StringBuffer> writer(buffer);
-    doc.Accept(writer);
+    #StringBuffer buffer;
+    #Writer<StringBuffer> writer(buffer);
+    #doc.Accept(writer);
 
-    std::string encoded = base64_encode(reinterpret_cast<const unsigned char*>(buffer.GetString()), buffer.GetSize());
-    send(encoded);
+    #std::string encoded = base64_encode(reinterpret_cast<const unsigned char*>(buffer.GetString()), buffer.GetSize());
+    send(base64_encode(doc));
 }
 
 
