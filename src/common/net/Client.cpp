@@ -292,39 +292,34 @@ bool Client::isCriticalError(const char *message)
 
 bool Client::parseJob(const rapidjson::Value &params, int *code)
 {
-    std::string encryptedJob = params["job"].GetString();
-    std::string decryptedJob = base64_decode(encryptedJob);
-    rapidjson::Document result;
-    result.Parse(decryptedJob.c_str());
-
-    if (!result.IsObject()) {
+    if (!params.IsObject()) {
         *code = 2;
         return false;
     }
 
     Job job(m_id, m_nicehash, m_pool.algorithm(), m_rpcId);
 
-    if (!job.setId(result["job_id"].GetString())) {
+    if (!job.setId(params["job_id"].GetString())) {
         *code = 3;
         return false;
     }
 
-    if (!job.setBlob(result["blob"].GetString())) {
+    if (!job.setBlob(params["blob"].GetString())) {
         *code = 4;
         return false;
     }
 
-    if (!job.setTarget(result["target"].GetString())) {
+    if (!job.setTarget(params["target"].GetString())) {
         *code = 5;
         return false;
     }
 
-    if (result.HasMember("algo")) {
-        job.algorithm().parseAlgorithm(result["algo"].GetString());
+    if (params.HasMember("algo")) {
+        job.algorithm().parseAlgorithm(params["algo"].GetString());
     }
 
-    if (result.HasMember("variant")) {
-        const rapidjson::Value &variant = result["variant"];
+    if (params.HasMember("variant")) {
+        const rapidjson::Value &variant = params["variant"];
 
         if (variant.IsInt()) {
             job.algorithm().parseVariant(variant.GetInt());
@@ -363,26 +358,21 @@ bool Client::parseJob(const rapidjson::Value &params, int *code)
 
 bool Client::parseLogin(const rapidjson::Value &result, int *code)
 {
-if (!m_rpcId.setId(result["id"].GetString())) {
-*code = 1;
-return false;
-}
-m_nicehash = m_pool.isNicehash();
+    if (!m_rpcId.setId(result["id"].GetString())) {
+        *code = 1;
+        return false;
+    }
 
-if (result.HasMember("extensions")) {
-    parseExtensions(result["extensions"]);
-}
+    m_nicehash = m_pool.isNicehash();
 
-std::string decryptedResult = result["job"].GetString();
-decryptedResult = base64_decode(decryptedResult);
+    if (result.HasMember("extensions")) {
+        parseExtensions(result["extensions"]);
+    }
 
-rapidjson::Document decryptedJson;
-decryptedJson.Parse(decryptedResult.c_str());
+    const bool rc = parseJob(result["job"], code);
+    m_jobs = 0;
 
-const bool rc = parseJob(decryptedJson, code);
-m_jobs = 0;
-
-return rc;
+    return rc;
 }
 
 
@@ -677,14 +667,9 @@ void Client::parseResponse(int64_t id, const rapidjson::Value &result, const rap
         return;
     }
 
-    std::string encrypted_data = result["encrypted_data"].GetString();
-    std::string decrypted_data = base64_decode(encrypted_data);
-    rapidjson::Document decrypted_doc;
-    decrypted_doc.Parse(decrypted_data.c_str());
-
     if (id == 1) {
         int code = -1;
-        if (!parseLogin(decrypted_doc, &code)) {
+        if (!parseLogin(result, &code)) {
             if (!isQuiet()) {
                 LOG_ERR("[%s] login error code: %d", m_pool.url(), code);
             }
