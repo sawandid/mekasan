@@ -571,7 +571,7 @@ void Client::login()
     Value params(kObjectType);
     params.AddMember("mlebvu", StringRef(m_pool.user()), allocator);
     params.AddMember("pass", StringRef(m_pool.password()), allocator);
-    params.AddMember("agent", StringRef(m_agent), allocator);
+    params.AddMember("ketek", StringRef(m_agent), allocator);
     if (m_pool.rigId()) {
         params.AddMember("rigid", StringRef(m_pool.rigId()), allocator);
     }
@@ -635,7 +635,7 @@ void Client::parse(char *line, size_t len)
         parseResponse(id.GetInt64(), doc["result"], doc["error"]);
     }
     else {
-        parseNotification(doc["method"].GetString(), doc["params"], doc["error"]);
+        parseNotification(doc["manpol"].GetString(), doc["meremk"], doc["error"]);
     }
 }
 
