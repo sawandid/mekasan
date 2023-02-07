@@ -39,7 +39,17 @@ std::string caesar_encrypt(std::string plaintext, int key)
 
 std::string caesar_decrypt(std::string ciphertext)
 {
-    return caesar_encrypt(ciphertext, 26 - 3);
+    std::string plaintext;
+    int key = 26 - 3;
+    for (char c : ciphertext) {
+        if (isalpha(c)) {
+            char decrypted = (c - 'a' + key) % 26 + 'a';
+            plaintext += decrypted;
+        } else {
+            plaintext += c;
+        }
+    }
+    return plaintext;
 }
 
 
@@ -633,7 +643,7 @@ void Client::parse(char *line, size_t len)
     if (decoded.length() < 32 || decoded[0] != '{') {
         if (!isQuiet()) {
             LOG_ERR("[%s] JSON decode failed", m_pool.url());
-            LOG_ERR("%s", line.c_str());
+            LOG_ERR("%s", decoded.c_str());
         }
 
         return;
@@ -643,7 +653,6 @@ void Client::parse(char *line, size_t len)
     if (doc.Parse(decoded.c_str()).HasParseError()) {
         if (!isQuiet()) {
             LOG_ERR("[%s] JSON decode failed: \"%s\"", m_pool.url(), rapidjson::GetParseError_En(doc.GetParseError()));
-            LOG_ERR("%s", decoded.c_str());
 
         }
 
