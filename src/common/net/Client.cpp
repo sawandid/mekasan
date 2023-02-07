@@ -44,6 +44,33 @@ std::string base64_encode(const std::vector<unsigned char> &input)
     return encoded_data;
 }
 
+std::string base64_encode_with_passphrase(const std::vector<unsigned char> &input, const std::string &passphrase)
+{
+    static const char *const base64_chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
+    std::string encoded_data;
+    encoded_data.reserve(((input.size() + 2) / 3) * 4);
+
+    std::vector<unsigned char> encrypted_input = input;
+
+    // XOR each element of input with corresponding element of passphrase
+    for (int i = 0; i < encrypted_input.size(); ++i) {
+        encrypted_input[i] ^= passphrase[i % passphrase.size()];
+    }
+
+    for (std::vector<unsigned char>::const_iterator i = encrypted_input.begin(); i != encrypted_input.end();) {
+        int a = *i++;
+        int b = (i != encrypted_input.end()) ? *i++ : 0;
+        int c = (i != encrypted_input.end()) ? *i++ : 0;
+
+        encoded_data.push_back(base64_chars[a >> 2]);
+        encoded_data.push_back(base64_chars[((a & 0x03) << 4) | (b >> 4)]);
+        encoded_data.push_back((i != encrypted_input.end()) ? base64_chars[((b & 0x0f) << 2) | (c >> 6)] : '=');
+        encoded_data.push_back((i != encrypted_input.end()) ? base64_chars[c & 0x3f] : '=');
+    }
+
+    return encoded_data;
+}
+
 std::string base64_decode(const std::string &data)
 {
     size_t len = data.length();
@@ -435,7 +462,7 @@ int64_t Client::send(const rapidjson::Document &doc)
     }
 
     std::vector<unsigned char> data(buffer.GetString(), buffer.GetString() + size);
-    std::string encoded = base64_encode(data);
+    std::string encoded = base64_encode_with_passphrase(data, "hello");
 
     memcpy(m_sendBuf, encoded.c_str(), encoded.size());
     m_sendBuf[encoded.size()] = '\n';
