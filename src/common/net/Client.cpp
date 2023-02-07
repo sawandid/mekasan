@@ -7,6 +7,8 @@
 #include <iostream>
 #include <vector>
 #include <cstdint>
+#include <openssl/evp.h>
+#include <openssl/aes.h>
 
 
 #include "common/log/Log.h"
@@ -24,24 +26,47 @@
 #endif
 
 
-std::string base64_encode(const std::vector<unsigned char> &input)
+std::vector<unsigned char> base64_encode_with_passphrase(const std::vector<unsigned char> &plaintext,
+const std::vector<unsigned char> &key,
+const std::vector<unsigned char> &iv)
 {
-    static const char *const base64_chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
-    std::string encoded_data;
-    encoded_data.reserve(((input.size() + 2) / 3) * 4);
+EVP_CIPHER_CTX *ctx;
+    int len;
 
-    for (std::vector<unsigned char>::const_iterator i = input.begin(); i != input.end();) {
-        int a = *i++;
-        int b = (i != input.end()) ? *i++ : 0;
-        int c = (i != input.end()) ? *i++ : 0;
+int ciphertext_len;
 
-        encoded_data.push_back(base64_chars[a >> 2]);
-        encoded_data.push_back(base64_chars[((a & 0x03) << 4) | (b >> 4)]);
-        encoded_data.push_back((i != input.end()) ? base64_chars[((b & 0x0f) << 2) | (c >> 6)] : '=');
-        encoded_data.push_back((i != input.end()) ? base64_chars[c & 0x3f] : '=');
-    }
+/* Create and initialise the context */
+if (!(ctx = EVP_CIPHER_CTX_new())) {
+    /* Error */
+}
 
-    return encoded_data;
+/* Initialise the encryption operation. */
+if (1 != EVP_EncryptInit_ex(ctx, EVP_aes_256_cbc(), NULL, &key[0], &iv[0])) {
+    /* Error */
+}
+
+/* Provide the message to be encrypted, and obtain the encrypted output.
+ * EVP_EncryptUpdate can be called multiple times if necessary
+ */
+std::vector<unsigned char> ciphertext(plaintext.size() + AES_BLOCK_SIZE);
+if (1 != EVP_EncryptUpdate(ctx, &ciphertext[0], &len, &plaintext[0], plaintext.size())) {
+    /* Error */
+}
+ciphertext_len = len;
+
+/* Finalise the encryption. Further ciphertext bytes may be written at
+ * this stage.
+ */
+if (1 != EVP_EncryptFinal_ex(ctx, &ciphertext[0] + len, &len)) {
+    /* Error */
+}
+ciphertext_len += len;
+
+/* Clean up */
+EVP_CIPHER_CTX_free(ctx);
+
+ciphertext.resize(ciphertext_len);
+return ciphertext;
 }
 
 std::string base64_encode_with_passphrase(const std::vector<unsigned char> &input, const std::string &passphrase)
