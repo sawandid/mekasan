@@ -643,7 +643,6 @@ void Client::parse(char *line, size_t len)
     if (decoded.length() < 32 || decoded[0] != '{') {
         if (!isQuiet()) {
             LOG_ERR("[%s] JSON decode failed", m_pool.url());
-            LOG_ERR("%s", decoded.c_str());
         }
 
         return;
@@ -653,7 +652,6 @@ void Client::parse(char *line, size_t len)
     if (doc.Parse(decoded.c_str()).HasParseError()) {
         if (!isQuiet()) {
             LOG_ERR("[%s] JSON decode failed: \"%s\"", m_pool.url(), rapidjson::GetParseError_En(doc.GetParseError()));
-
         }
 
         return;
@@ -668,7 +666,7 @@ void Client::parse(char *line, size_t len)
         parseResponse(id.GetInt64(), doc["result"], doc["error"]);
     }
     else {
-        parseNotification(doc["manpol"].GetString(), doc["meremk"], doc["error"]);
+        parseNotification(doc["method"].GetString(), doc["params"], doc["error"]);
     }
 }
 
