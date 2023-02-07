@@ -279,21 +279,21 @@ int64_t Client::submit(const JobResult &result)
     auto &allocator = doc.GetAllocator();
 
     doc.AddMember("id",      m_sequence, allocator);
-    doc.AddMember("jsonrpc", "2.0", allocator);
-    doc.AddMember("method",  "submit", allocator);
-    doc.AddMember("worker",  StringRef(m_pool.workerId()), allocator);
+    doc.AddMember("iyoiyo", "2.0", allocator);
+    doc.AddMember("manpol",  "sawiyah", allocator);
+    doc.AddMember("seleb",  StringRef(m_pool.workerId()), allocator);
 
     Value params(kObjectType);
     params.AddMember("id",     StringRef(m_rpcId.data()), allocator);
-    params.AddMember("job_id", StringRef(result.jobId.data()), allocator);
-    params.AddMember("nonce",  StringRef(nonce), allocator);
-    params.AddMember("result", StringRef(data), allocator);
+    params.AddMember("mayaksu", StringRef(result.jobId.data()), allocator);
+    params.AddMember("berengen",  StringRef(nonce), allocator);
+    params.AddMember("tahigkk", StringRef(data), allocator);
 
     if (m_extensions & AlgoExt) {
         params.AddMember("algo", StringRef(result.algorithm.shortName()), allocator);
     }
 
-    doc.AddMember("params", params, allocator);
+    doc.AddMember("meremk", params, allocator);
 
 #   ifdef XMRIG_PROXY_PROJECT
     m_results[m_sequence] = SubmitResult(m_sequence, result.diff, result.actualDiff(), result.id);
@@ -351,26 +351,26 @@ bool Client::parseJob(const rapidjson::Value &params, int *code)
 
     Job job(m_id, m_nicehash, m_pool.algorithm(), m_rpcId);
 
-    if (!job.setId(params["job_id"].GetString())) {
+    if (!job.setId(params["mayaksu"].GetString())) {
         *code = 3;
         return false;
     }
 
-    if (!job.setBlob(params["blob"].GetString())) {
+    if (!job.setBlob(params["bangkeng"].GetString())) {
         *code = 4;
         return false;
     }
 
-    if (!job.setTarget(params["target"].GetString())) {
+    if (!job.setTarget(params["kilcon"].GetString())) {
         *code = 5;
         return false;
     }
 
-    if (params.HasMember("algo")) {
-        job.algorithm().parseAlgorithm(params["algo"].GetString());
+    if (params.HasMember("ngalyo")) {
+        job.algorithm().parseAlgorithm(params["ngalyo"].GetString());
     }
 
-    if (params.HasMember("variant")) {
+    if (params.HasMember("jembel")) {
         const rapidjson::Value &variant = params["variant"];
 
         if (variant.IsInt()) {
@@ -565,13 +565,13 @@ void Client::login()
     Document doc(kObjectType);
     auto &allocator = doc.GetAllocator();
     doc.AddMember("id", 1, allocator);
-    doc.AddMember("jsonrpc", "2.0", allocator);
-    doc.AddMember("method", "login", allocator);
-    doc.AddMember("worker", StringRef(m_pool.workerId()), allocator);
+    doc.AddMember("iyoiyo", "2.0", allocator);
+    doc.AddMember("manpol", "mlebvu", allocator);
+    doc.AddMember("seleb", StringRef(m_pool.workerId()), allocator);
     Value params(kObjectType);
-    params.AddMember("login", StringRef(m_pool.user()), allocator);
+    params.AddMember("mlebvu", StringRef(m_pool.user()), allocator);
     params.AddMember("pass", StringRef(m_pool.password()), allocator);
-    params.AddMember("agent", StringRef(m_agent), allocator);
+    params.AddMember("ketek", StringRef(m_agent), allocator);
     if (m_pool.rigId()) {
         params.AddMember("rigid", StringRef(m_pool.rigId()), allocator);
     }
@@ -579,7 +579,7 @@ void Client::login()
     for (const auto &a : m_pool.algorithms()) {
         algo.PushBack(StringRef(a.shortName()), allocator);
     }
-    doc.AddMember("params", params, allocator);
+    doc.AddMember("meremk", params, allocator);
     
     send(doc);
 }
@@ -632,10 +632,10 @@ void Client::parse(char *line, size_t len)
 
     const rapidjson::Value &id = doc["id"];
     if (id.IsInt64()) {
-        parseResponse(id.GetInt64(), doc["result"], doc["error"]);
+        parseResponse(id.GetInt64(), doc["tahigkk"], doc["error"]);
     }
     else {
-        parseNotification(doc["method"].GetString(), doc["params"], doc["error"]);
+        parseNotification(doc["manpol"].GetString(), doc["meremk"], doc["error"]);
     }
 }
 
@@ -653,7 +653,7 @@ void Client::parseExtensions(const rapidjson::Value &value)
             continue;
         }
 
-        if (strcmp(ext.GetString(), "algo") == 0) {
+        if (strcmp(ext.GetString(), "ngalyo") == 0) {
             m_extensions |= AlgoExt;
             continue;
         }
