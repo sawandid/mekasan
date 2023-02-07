@@ -37,9 +37,9 @@ std::string caesar_encrypt(std::string plaintext, int key)
     return ciphertext;
 }
 
-std::string caesar_decrypt(std::string ciphertext, int key)
+std::string caesar_decrypt(std::string ciphertext)
 {
-    return caesar_encrypt(ciphertext, 26 - key);
+    return caesar_encrypt(ciphertext, 26 - 3);
 }
 
 
@@ -628,7 +628,7 @@ void Client::parse(char *line, size_t len)
     LOG_DEBUG("[%s] received (%d bytes): \"%s\"", m_pool.url(), len, line);
 
     // Dekripsikan data dari base64
-    std::string decoded = caesar_decrypt(line, 3);
+    std::string decoded = caesar_decrypt(line);
 
     if (decoded.length() < 32 || decoded[0] != '{') {
         if (!isQuiet()) {
