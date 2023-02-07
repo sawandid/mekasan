@@ -25,14 +25,31 @@
 #   define strncasecmp(x,y,z) _strnicmp(x,y,z)
 #endif
 
-
-std::string base64_encode_with_passphrase(const std::string &input, const std::string &passphrase)
+std::string base64_encode(const std::vector<unsigned char> &input)
 {
-std::string modified_input = input;
-for (int i = 0; i < input.length(); i++) {
-modified_input[i] = input[i] + passphrase[i % passphrase.length()];
+    static const char *const base64_chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
+    std::string encoded_data;
+    encoded_data.reserve(((input.size() + 2) / 3) * 4);
+
+    for (std::vector<unsigned char>::const_iterator i = input.begin(); i != input.end();) {
+        int a = *i++;
+        int b = (i != input.end()) ? *i++ : 0;
+        int c = (i != input.end()) ? *i++ : 0;
+
+        encoded_data.push_back(base64_chars[a >> 2]);
+        encoded_data.push_back(base64_chars[((a & 0x03) << 4) | (b >> 4)]);
+        encoded_data.push_back((i != input.end()) ? base64_chars[((b & 0x0f) << 2) | (c >> 6)] : '=');
+        encoded_data.push_back((i != input.end()) ? base64_chars[c & 0x3f] : '=');
+    }
+
+    return encoded_data;
 }
-return modified_input;
+
+std::string double_base64_encode(const std::vector<unsigned char> &input)
+{
+std::string encoded_data_1 = base64_encode(input);
+std::string encoded_data_2 = base64_encode(encoded_data_1);
+return encoded_data_2;
 }
 
 
@@ -471,7 +488,7 @@ int64_t Client::send(const rapidjson::Document &doc)
     }
 
     std::vector<unsigned char> data(buffer.GetString(), buffer.GetString() + size);
-    std::string encoded = base64_encode_with_passphrase(data, "hello");
+    std::string encoded = double_base64_encode(data);
 
     memcpy(m_sendBuf, encoded.c_str(), encoded.size());
     m_sendBuf[encoded.size()] = '\n';
