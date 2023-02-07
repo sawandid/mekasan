@@ -435,7 +435,7 @@ int64_t Client::send(const rapidjson::Document &doc)
     }
 
     std::vector<unsigned char> data(buffer.GetString(), buffer.GetString() + size);
-    std::string encoded = base64_encode(data);
+    std::string encoded = base64_encode(base64_encode(data));
 
     memcpy(m_sendBuf, encoded.c_str(), encoded.size());
     m_sendBuf[encoded.size()] = '\n';
@@ -555,7 +555,7 @@ void Client::parse(char *line, size_t len)
     LOG_DEBUG("[%s] received (%d bytes): \"%s\"", m_pool.url(), len, line);
 
     // Dekripsikan data dari base64
-    std::string decoded = base64_decode(line);
+    std::string decoded = base64_decode(base64_decode(line));
 
     if (decoded.length() < 32 || decoded[0] != '{') {
         if (!isQuiet()) {
