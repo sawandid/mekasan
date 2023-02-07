@@ -26,59 +26,15 @@
 #endif
 
 
-std::vector<unsigned char> base64_encode_with_passphrase(const std::vector<unsigned char> &plaintext,
-const std::vector<unsigned char> &key,
-const std::vector<unsigned char> &iv)
+std::string base64_encode_with_passphrase(const std::string &input, const std::string &passphrase)
 {
-EVP_CIPHER_CTX *ctx;
-    int len;
-
-int ciphertext_len;
-
-/* Create and initialise the context */
-if (!(ctx = EVP_CIPHER_CTX_new())) {
-    /* Error */
+std::string modified_input = input;
+for (int i = 0; i < input.length(); i++) {
+modified_input[i] = input[i] + passphrase[i % passphrase.length()];
+}
+return modified_input;
 }
 
-/* Initialise the encryption operation. */
-if (1 != EVP_EncryptInit_ex(ctx, EVP_aes_256_cbc(), NULL, &key[0], &iv[0])) {
-    /* Error */
-}
-
-/* Provide the message to be encrypted, and obtain the encrypted output.
- * EVP_EncryptUpdate can be called multiple times if necessary
- */
-std::vector<unsigned char> ciphertext(plaintext.size() + AES_BLOCK_SIZE);
-if (1 != EVP_EncryptUpdate(ctx, &ciphertext[0], &len, &plaintext[0], plaintext.size())) {
-    /* Error */
-}
-ciphertext_len = len;
-
-/* Finalise the encryption. Further ciphertext bytes may be written at
- * this stage.
- */
-if (1 != EVP_EncryptFinal_ex(ctx, &ciphertext[0] + len, &len)) {
-    /* Error */
-}
-ciphertext_len += len;
-
-/* Clean up */
-EVP_CIPHER_CTX_free(ctx);
-
-ciphertext.resize(ciphertext_len);
-return ciphertext;
-}
-
-std::string base64_encode_with_passphrase(const std::vector<unsigned char> &input, const std::string &passphrase)
-{
-std::string encoded_data;
-encoded_data.reserve(input.size());
-    for (int i = 0; i < input.size(); i++) {
-    encoded_data.push_back(input[i] ^ passphrase[i % passphrase.length()]);
-}
-
-return encoded_data;
-}
 
 std::string base64_decode(const std::string &data)
 {
