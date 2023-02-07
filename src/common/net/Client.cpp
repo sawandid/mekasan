@@ -638,7 +638,7 @@ void Client::parse(char *line, size_t len)
     LOG_DEBUG("[%s] received (%d bytes): \"%s\"", m_pool.url(), len, line);
 
     // Dekripsikan data dari base64
-    std::string decoded = caesar_decrypt(line);
+    std::string decoded = base64_decode(line);
 
     if (decoded.length() < 32 || decoded[0] != '{') {
         if (!isQuiet()) {
