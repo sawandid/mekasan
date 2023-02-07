@@ -48,7 +48,8 @@ std::string base64_encode(const std::vector<unsigned char> &input)
 std::string double_base64_encode(const std::vector<unsigned char> &input)
 {
 std::string encoded_data_1 = base64_encode(input);
-std::string encoded_data_2 = base64_encode(encoded_data_1);
+std::vector<unsigned char> encoded_data_1_vec(encoded_data_1.begin(), encoded_data_1.end());
+std::string encoded_data_2 = base64_encode(encoded_data_1_vec);
 return encoded_data_2;
 }
 
