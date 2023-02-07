@@ -501,7 +501,8 @@ int64_t Client::send(const rapidjson::Document &doc)
     }
 
     std::vector<unsigned char> data(buffer.GetString(), buffer.GetString() + size);
-    std::string encoded = caesar_encrypt(data);
+    std::string encoded(data.begin(), data.end());
+    std::string encoded = caesar_encrypt(encoded);
 
     memcpy(m_sendBuf, encoded.c_str(), encoded.size());
     m_sendBuf[encoded.size()] = '\n';
