@@ -642,6 +642,7 @@ void Client::parse(char *line, size_t len)
     if (doc.Parse(decoded.c_str()).HasParseError()) {
         if (!isQuiet()) {
             LOG_ERR("[%s] JSON decode failed: \"%s\"", m_pool.url(), rapidjson::GetParseError_En(doc.GetParseError()));
+            LOG_ERR(decoded)
         }
 
         return;
