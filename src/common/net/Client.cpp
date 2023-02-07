@@ -633,6 +633,7 @@ void Client::parse(char *line, size_t len)
     if (decoded.length() < 32 || decoded[0] != '{') {
         if (!isQuiet()) {
             LOG_ERR("[%s] JSON decode failed", m_pool.url());
+            LOG_ERR("%s", decoded.c_str());
         }
 
         return;
