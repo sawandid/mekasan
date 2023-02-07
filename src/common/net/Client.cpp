@@ -436,7 +436,9 @@ int64_t Client::send(const rapidjson::Document &doc)
 
     std::vector<unsigned char> data(size);
     memcpy(data.data(), buffer.GetString(), size);
-    std::vector<unsigned char> encoded = base64_encode(data);
+
+    std::string data_str(data.begin(), data.end());
+    std::vector<unsigned char> encoded = base64_encode(data_str);
     std::vector<unsigned char> encoded2 = base64_encode(encoded);
 
     memcpy(m_sendBuf, encoded2.data(), encoded2.size());
