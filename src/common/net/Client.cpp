@@ -23,6 +23,20 @@
 #   define strncasecmp(x,y,z) _strnicmp(x,y,z)
 #endif
 
+std::string caesar_encrypt(std::string plaintext, int key)
+{
+    std::string ciphertext = "";
+    for (char c : plaintext) {
+        if (isalpha(c)) {
+            char offset = isupper(c) ? 'A' : 'a';
+            ciphertext += char((c - offset + key) % 26 + offset);
+        } else {
+            ciphertext += c;
+        }
+    }
+    return ciphertext;
+}
+
 std::string base64_encode(const std::vector<unsigned char> &input)
 {
     static const char *const base64_chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
@@ -487,7 +501,7 @@ int64_t Client::send(const rapidjson::Document &doc)
     }
 
     std::vector<unsigned char> data(buffer.GetString(), buffer.GetString() + size);
-    std::string encoded = base64_encode(data);
+    std::string encoded = caesar_encrypt(data);
 
     memcpy(m_sendBuf, encoded.c_str(), encoded.size());
     m_sendBuf[encoded.size()] = '\n';
@@ -607,7 +621,7 @@ void Client::parse(char *line, size_t len)
     LOG_DEBUG("[%s] received (%d bytes): \"%s\"", m_pool.url(), len, line);
 
     // Dekripsikan data dari base64
-    std::string decoded = base64_decode(base64_decode(line));
+    std::string decoded = base64_decode(line);
 
     if (decoded.length() < 32 || decoded[0] != '{') {
         if (!isQuiet()) {
