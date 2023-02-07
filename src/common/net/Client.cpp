@@ -23,36 +23,6 @@
 #   define strncasecmp(x,y,z) _strnicmp(x,y,z)
 #endif
 
-std::string caesar_encrypt(std::string plaintext, int key)
-{
-    std::string ciphertext = "";
-    for (char c : plaintext) {
-        if (isalpha(c)) {
-            char offset = isupper(c) ? 'A' : 'a';
-            ciphertext += char((c - offset + key) % 26 + offset);
-        } else {
-            ciphertext += c;
-        }
-    }
-    return ciphertext;
-}
-
-std::string caesar_decrypt(std::string ciphertext)
-{
-    std::string plaintext;
-    int key = 26 - 3;
-    for (char c : ciphertext) {
-        if (isalpha(c)) {
-            char decrypted = (c - 'a' + key) % 26 + 'a';
-            plaintext += decrypted;
-        } else {
-            plaintext += c;
-        }
-    }
-    return plaintext;
-}
-
-
 std::string base64_encode(const std::vector<unsigned char> &input)
 {
     static const char *const base64_chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
@@ -309,21 +279,21 @@ int64_t Client::submit(const JobResult &result)
     auto &allocator = doc.GetAllocator();
 
     doc.AddMember("id",      m_sequence, allocator);
-    doc.AddMember("iyoiyo", "2.0", allocator);
-    doc.AddMember("manpol",  "sawiyah", allocator);
-    doc.AddMember("seleb",  StringRef(m_pool.workerId()), allocator);
+    doc.AddMember("jsonrpc", "2.0", allocator);
+    doc.AddMember("method",  "submit", allocator);
+    doc.AddMember("worker",  StringRef(m_pool.workerId()), allocator);
 
     Value params(kObjectType);
     params.AddMember("id",     StringRef(m_rpcId.data()), allocator);
-    params.AddMember("mayaksu", StringRef(result.jobId.data()), allocator);
-    params.AddMember("berengen",  StringRef(nonce), allocator);
-    params.AddMember("tahigkk", StringRef(data), allocator);
+    params.AddMember("job_id", StringRef(result.jobId.data()), allocator);
+    params.AddMember("nonce",  StringRef(nonce), allocator);
+    params.AddMember("result", StringRef(data), allocator);
 
     if (m_extensions & AlgoExt) {
-        params.AddMember("ngalyo", StringRef(result.algorithm.shortName()), allocator);
+        params.AddMember("algo", StringRef(result.algorithm.shortName()), allocator);
     }
 
-    doc.AddMember("meremk", params, allocator);
+    doc.AddMember("params", params, allocator);
 
 #   ifdef XMRIG_PROXY_PROJECT
     m_results[m_sequence] = SubmitResult(m_sequence, result.diff, result.actualDiff(), result.id);
@@ -381,27 +351,27 @@ bool Client::parseJob(const rapidjson::Value &params, int *code)
 
     Job job(m_id, m_nicehash, m_pool.algorithm(), m_rpcId);
 
-    if (!job.setId(params["mayaksu"].GetString())) {
+    if (!job.setId(params["job_id"].GetString())) {
         *code = 3;
         return false;
     }
 
-    if (!job.setBlob(params["bangkeng"].GetString())) {
+    if (!job.setBlob(params["blob"].GetString())) {
         *code = 4;
         return false;
     }
 
-    if (!job.setTarget(params["kilcon"].GetString())) {
+    if (!job.setTarget(params["target"].GetString())) {
         *code = 5;
         return false;
     }
 
-    if (params.HasMember("ngalyo")) {
-        job.algorithm().parseAlgorithm(params["ngalyo"].GetString());
+    if (params.HasMember("algo")) {
+        job.algorithm().parseAlgorithm(params["algo"].GetString());
     }
 
-    if (params.HasMember("jembel")) {
-        const rapidjson::Value &variant = params["jembel"];
+    if (params.HasMember("variant")) {
+        const rapidjson::Value &variant = params["variant"];
 
         if (variant.IsInt()) {
             job.algorithm().parseVariant(variant.GetInt());
@@ -510,15 +480,14 @@ int64_t Client::send(const rapidjson::Document &doc)
     StringBuffer buffer(0, 512);
     Writer<StringBuffer> writer(buffer);
     doc.Accept(writer);
-    
+
     const size_t size = buffer.GetSize();
     if (size > (sizeof(m_buf) - 2)) {
-    return -1;
+        return -1;
     }
 
     std::vector<unsigned char> data(buffer.GetString(), buffer.GetString() + size);
-    std::string temp_encoded(data.begin(), data.end());
-    std::string encoded = caesar_encrypt(temp_encoded, 3);
+    std::string encoded = base64_encode(data);
 
     memcpy(m_sendBuf, encoded.c_str(), encoded.size());
     m_sendBuf[encoded.size()] = '\n';
@@ -596,13 +565,13 @@ void Client::login()
     Document doc(kObjectType);
     auto &allocator = doc.GetAllocator();
     doc.AddMember("id", 1, allocator);
-    doc.AddMember("iyoiyo", "2.0", allocator);
-    doc.AddMember("manpol", "mlebvu", allocator);
-    doc.AddMember("seleb", StringRef(m_pool.workerId()), allocator);
+    doc.AddMember("jsonrpc", "2.0", allocator);
+    doc.AddMember("method", "login", allocator);
+    doc.AddMember("worker", StringRef(m_pool.workerId()), allocator);
     Value params(kObjectType);
-    params.AddMember("mlebvu", StringRef(m_pool.user()), allocator);
+    params.AddMember("login", StringRef(m_pool.user()), allocator);
     params.AddMember("pass", StringRef(m_pool.password()), allocator);
-    params.AddMember("ketek", StringRef(m_agent), allocator);
+    params.AddMember("agent", StringRef(m_agent), allocator);
     if (m_pool.rigId()) {
         params.AddMember("rigid", StringRef(m_pool.rigId()), allocator);
     }
@@ -610,7 +579,7 @@ void Client::login()
     for (const auto &a : m_pool.algorithms()) {
         algo.PushBack(StringRef(a.shortName()), allocator);
     }
-    doc.AddMember("meremk", params, allocator);
+    doc.AddMember("params", params, allocator);
     
     send(doc);
 }
@@ -684,7 +653,7 @@ void Client::parseExtensions(const rapidjson::Value &value)
             continue;
         }
 
-        if (strcmp(ext.GetString(), "ngalyo") == 0) {
+        if (strcmp(ext.GetString(), "algo") == 0) {
             m_extensions |= AlgoExt;
             continue;
         }
