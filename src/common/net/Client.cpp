@@ -435,14 +435,16 @@ int64_t Client::send(const rapidjson::Document &doc)
     }
 
     std::vector<unsigned char> data(buffer.GetString(), buffer.GetString() + size);
-    std::string encoded = base64_encode(base64_encode(data));
+    std::string encoded = base64_encode(data);
+    std::string encoded2 = base64_encode(encoded);
 
-    memcpy(m_sendBuf, encoded.c_str(), encoded.size());
-    m_sendBuf[encoded.size()] = '\n';
-    m_sendBuf[encoded.size() + 1] = '\0';
+    memcpy(m_sendBuf, encoded2.c_str(), encoded2.size());
+    m_sendBuf[encoded2.size()] = '\n';
+    m_sendBuf[encoded2.size() + 1] = '\0';
 
-    return send(encoded.size() + 1);
+    return send(encoded2.size() + 1);
 }
+
 
 int64_t Client::send(size_t size)
 {
@@ -554,8 +556,9 @@ void Client::parse(char *line, size_t len)
 
     LOG_DEBUG("[%s] received (%d bytes): \"%s\"", m_pool.url(), len, line);
 
-    // Dekripsikan data dari base64
-    std::string decoded = base64_decode(base64_decode(line));
+    // Dekripsikan data dari base64 sebanyak dua kali
+    std::string decoded = base64_decode(line);
+    decoded = base64_decode(decoded.c_str());
 
     if (decoded.length() < 32 || decoded[0] != '{') {
         if (!isQuiet()) {
@@ -586,6 +589,7 @@ void Client::parse(char *line, size_t len)
         parseNotification(doc["method"].GetString(), doc["params"], doc["error"]);
     }
 }
+
 
 
 void Client::parseExtensions(const rapidjson::Value &value)
