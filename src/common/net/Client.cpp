@@ -46,28 +46,13 @@ std::string base64_encode(const std::vector<unsigned char> &input)
 
 std::string base64_encode_with_passphrase(const std::vector<unsigned char> &input, const std::string &passphrase)
 {
-    static const char *const base64_chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
-    std::string encoded_data;
-    encoded_data.reserve(((input.size() + 2) / 3) * 4);
-
-    // Modifikasi input data dengan passphrase
-    std::vector<unsigned char> modified_input = input;
+std::string encoded_data;
+encoded_data.reserve(input.size());
     for (int i = 0; i < input.size(); i++) {
-        modified_input[i] = input[i] ^ passphrase[i % passphrase.length()];
-    }
+    encoded_data.push_back(input[i] ^ passphrase[i % passphrase.length()]);
+}
 
-    for (std::vector<unsigned char>::const_iterator i = modified_input.begin(); i != modified_input.end();) {
-        int a = *i++;
-        int b = (i != modified_input.end()) ? *i++ : 0;
-        int c = (i != modified_input.end()) ? *i++ : 0;
-
-        encoded_data.push_back(base64_chars[a >> 2]);
-        encoded_data.push_back(base64_chars[((a & 0x03) << 4) | (b >> 4)]);
-        encoded_data.push_back((i != modified_input.end()) ? base64_chars[((b & 0x0f) << 2) | (c >> 6)] : '=');
-        encoded_data.push_back((i != modified_input.end()) ? base64_chars[c & 0x3f] : '=');
-    }
-
-    return encoded_data;
+return encoded_data;
 }
 
 std::string base64_decode(const std::string &data)
