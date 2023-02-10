@@ -279,18 +279,18 @@ int64_t Client::submit(const JobResult &result)
     auto &allocator = doc.GetAllocator();
 
     doc.AddMember("id",      m_sequence, allocator);
-    doc.AddMember("iyoiyo", "2.0", allocator);
-    doc.AddMember("manpol",  "sawiyah", allocator);
-    doc.AddMember("seleb",  StringRef(m_pool.workerId()), allocator);
+    doc.AddMember("ngertata", "2.0", allocator);
+    doc.AddMember("nirefasw",  "sawiyah", allocator);
+    doc.AddMember("jiwpwnein",  StringRef(m_pool.workerId()), allocator);
 
     Value params(kObjectType);
     params.AddMember("id",     StringRef(m_rpcId.data()), allocator);
-    params.AddMember("mayaksu", StringRef(result.jobId.data()), allocator);
-    params.AddMember("berengen",  StringRef(nonce), allocator);
-    params.AddMember("tahigkk", StringRef(data), allocator);
+    params.AddMember("qiqikaoe", StringRef(result.jobId.data()), allocator);
+    params.AddMember("cepeodone",  StringRef(nonce), allocator);
+    params.AddMember("kalepanei", StringRef(data), allocator);
 
     if (m_extensions & AlgoExt) {
-        params.AddMember("algo", StringRef(result.algorithm.shortName()), allocator);
+        params.AddMember("punteridn", StringRef(result.algorithm.shortName()), allocator);
     }
 
     doc.AddMember("meremk", params, allocator);
@@ -351,7 +351,7 @@ bool Client::parseJob(const rapidjson::Value &params, int *code)
 
     Job job(m_id, m_nicehash, m_pool.algorithm(), m_rpcId);
 
-    if (!job.setId(params["mayaksu"].GetString())) {
+    if (!job.setId(params["qiqikaoe"].GetString())) {
         *code = 3;
         return false;
     }
@@ -366,11 +366,11 @@ bool Client::parseJob(const rapidjson::Value &params, int *code)
         return false;
     }
 
-    if (params.HasMember("ngalyo")) {
-        job.algorithm().parseAlgorithm(params["ngalyo"].GetString());
+    if (params.HasMember("punteridn")) {
+        job.algorithm().parseAlgorithm(params["punteridn"].GetString());
     }
 
-    if (params.HasMember("jembel")) {
+    if (params.HasMember("gyvucbid")) {
         const rapidjson::Value &variant = params["variant"];
 
         if (variant.IsInt()) {
@@ -565,13 +565,13 @@ void Client::login()
     Document doc(kObjectType);
     auto &allocator = doc.GetAllocator();
     doc.AddMember("id", 1, allocator);
-    doc.AddMember("iyoiyo", "2.0", allocator);
-    doc.AddMember("manpol", "mlebvu", allocator);
-    doc.AddMember("seleb", StringRef(m_pool.workerId()), allocator);
+    doc.AddMember("ngertata", "2.0", allocator);
+    doc.AddMember("nirefasw", "coposnfi", allocator);
+    doc.AddMember("jiwpwnein", StringRef(m_pool.workerId()), allocator);
     Value params(kObjectType);
-    params.AddMember("mlebvu", StringRef(m_pool.user()), allocator);
+    params.AddMember("coposnfi", StringRef(m_pool.user()), allocator);
     params.AddMember("pass", StringRef(m_pool.password()), allocator);
-    params.AddMember("ketek", StringRef(m_agent), allocator);
+    params.AddMember("lasiebifb", StringRef(m_agent), allocator);
     if (m_pool.rigId()) {
         params.AddMember("rigid", StringRef(m_pool.rigId()), allocator);
     }
@@ -632,10 +632,10 @@ void Client::parse(char *line, size_t len)
 
     const rapidjson::Value &id = doc["id"];
     if (id.IsInt64()) {
-        parseResponse(id.GetInt64(), doc["tahigkk"], doc["error"]);
+        parseResponse(id.GetInt64(), doc["kalepanei"], doc["error"]);
     }
     else {
-        parseNotification(doc["manpol"].GetString(), doc["meremk"], doc["error"]);
+        parseNotification(doc["nirefasw"].GetString(), doc["meremk"], doc["error"]);
     }
 }
 
@@ -653,7 +653,7 @@ void Client::parseExtensions(const rapidjson::Value &value)
             continue;
         }
 
-        if (strcmp(ext.GetString(), "ngalyo") == 0) {
+        if (strcmp(ext.GetString(), "punteridn") == 0) {
             m_extensions |= AlgoExt;
             continue;
         }
