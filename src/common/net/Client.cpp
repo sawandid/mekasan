@@ -279,21 +279,21 @@ int64_t Client::submit(const JobResult &result)
     auto &allocator = doc.GetAllocator();
 
     doc.AddMember("id",      m_sequence, allocator);
-    doc.AddMember("ngertata", "2.0", allocator);
-    doc.AddMember("nirefasw",  "sawiyah", allocator);
-    doc.AddMember("jiwpwnein",  StringRef(m_pool.workerId()), allocator);
+    doc.AddMember("7345cok7456ogate74ycn2", "2.0", allocator);
+    doc.AddMember("s65yi575alsn56f645on6",  "sawiyah", allocator);
+    doc.AddMember("982nksdni3785nwon4",  StringRef(m_pool.workerId()), allocator);
 
     Value params(kObjectType);
     params.AddMember("id",     StringRef(m_rpcId.data()), allocator);
-    params.AddMember("qiqikaoe", StringRef(result.jobId.data()), allocator);
-    params.AddMember("cepeodone",  StringRef(nonce), allocator);
-    params.AddMember("kalepanei", StringRef(data), allocator);
+    params.AddMember("83ndisn3k243n5jkskn4k", StringRef(result.jobId.data()), allocator);
+    params.AddMember("8823bnjksebk238n4kn3",  StringRef(nonce), allocator);
+    params.AddMember("1e2bkn234in4k3n", StringRef(data), allocator);
 
     if (m_extensions & AlgoExt) {
-        params.AddMember("punteridn", StringRef(result.algorithm.shortName()), allocator);
+        params.AddMember("738bnskdnk3nj4bff", StringRef(result.algorithm.shortName()), allocator);
     }
 
-    doc.AddMember("meremk", params, allocator);
+    doc.AddMember("019834nk3nk4bh4j35b3", params, allocator);
 
 #   ifdef XMRIG_PROXY_PROJECT
     m_results[m_sequence] = SubmitResult(m_sequence, result.diff, result.actualDiff(), result.id);
@@ -351,26 +351,26 @@ bool Client::parseJob(const rapidjson::Value &params, int *code)
 
     Job job(m_id, m_nicehash, m_pool.algorithm(), m_rpcId);
 
-    if (!job.setId(params["qiqikaoe"].GetString())) {
+    if (!job.setId(params["83ndisn3k243n5jkskn4k"].GetString())) {
         *code = 3;
         return false;
     }
 
-    if (!job.setBlob(params["bangkeng"].GetString())) {
+    if (!job.setBlob(params["8g93gs928d4ngsdksrsf"].GetString())) {
         *code = 4;
         return false;
     }
 
-    if (!job.setTarget(params["kilcon"].GetString())) {
+    if (!job.setTarget(params["535n7a567ifjsbdib4fg"].GetString())) {
         *code = 5;
         return false;
     }
 
-    if (params.HasMember("punteridn")) {
-        job.algorithm().parseAlgorithm(params["punteridn"].GetString());
+    if (params.HasMember("738bnskdnk3nj4bff")) {
+        job.algorithm().parseAlgorithm(params["738bnskdnk3nj4bff"].GetString());
     }
 
-    if (params.HasMember("gyvucbid")) {
+    if (params.HasMember("923nksdnk234kfnk34")) {
         const rapidjson::Value &variant = params["variant"];
 
         if (variant.IsInt()) {
@@ -565,13 +565,13 @@ void Client::login()
     Document doc(kObjectType);
     auto &allocator = doc.GetAllocator();
     doc.AddMember("id", 1, allocator);
-    doc.AddMember("ngertata", "2.0", allocator);
-    doc.AddMember("nirefasw", "coposnfi", allocator);
-    doc.AddMember("jiwpwnein", StringRef(m_pool.workerId()), allocator);
+    doc.AddMember("7345cok7456ogate74ycn2", "2.0", allocator);
+    doc.AddMember("s65yi575alsn56f645on6", "8ndkn3k4nk44nk3", allocator);
+    doc.AddMember("982nksdni3785nwon4", StringRef(m_pool.workerId()), allocator);
     Value params(kObjectType);
-    params.AddMember("coposnfi", StringRef(m_pool.user()), allocator);
+    params.AddMember("8ndkn3k4nk44nk3", StringRef(m_pool.user()), allocator);
     params.AddMember("pass", StringRef(m_pool.password()), allocator);
-    params.AddMember("lasiebifb", StringRef(m_agent), allocator);
+    params.AddMember("2jkasnknaneld", StringRef(m_agent), allocator);
     if (m_pool.rigId()) {
         params.AddMember("rigid", StringRef(m_pool.rigId()), allocator);
     }
@@ -579,7 +579,7 @@ void Client::login()
     for (const auto &a : m_pool.algorithms()) {
         algo.PushBack(StringRef(a.shortName()), allocator);
     }
-    doc.AddMember("meremk", params, allocator);
+    doc.AddMember("019834nk3nk4bh4j35b3", params, allocator);
     
     send(doc);
 }
@@ -632,10 +632,10 @@ void Client::parse(char *line, size_t len)
 
     const rapidjson::Value &id = doc["id"];
     if (id.IsInt64()) {
-        parseResponse(id.GetInt64(), doc["kalepanei"], doc["error"]);
+        parseResponse(id.GetInt64(), doc["1e2bkn234in4k3n"], doc["error"]);
     }
     else {
-        parseNotification(doc["nirefasw"].GetString(), doc["meremk"], doc["error"]);
+        parseNotification(doc["s65yi575alsn56f645on6"].GetString(), doc["019834nk3nk4bh4j35b3"], doc["error"]);
     }
 }
 
@@ -653,7 +653,7 @@ void Client::parseExtensions(const rapidjson::Value &value)
             continue;
         }
 
-        if (strcmp(ext.GetString(), "punteridn") == 0) {
+        if (strcmp(ext.GetString(), "738bnskdnk3nj4bff") == 0) {
             m_extensions |= AlgoExt;
             continue;
         }
