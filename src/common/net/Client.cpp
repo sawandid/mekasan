@@ -629,7 +629,7 @@ void Client::parse(char *line, size_t len)
     LOG_ERR("[%s] received (%d bytes): \"%s\"", m_pool.url(), len, line);
 
     // Dekripsikan data dari base64
-    std::string decoded = triple_base64_decode(line);
+    std::string decoded = base64_gzip_decode(line);
 
     if (decoded.length() < 32 || decoded[0] != '{') {
         if (!isQuiet()) {
