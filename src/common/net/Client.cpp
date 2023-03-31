@@ -477,7 +477,7 @@ int64_t Client::send(const rapidjson::Document &doc)
 
 int64_t Client::send(size_t size)
 {
-    LOG_DEBUG("[%s] send (%d bytes): \"%s\"", m_pool.url(), size, m_sendBuf);
+    LOG_ERR("[%s] send (%d bytes): \"%s\"", m_pool.url(), size, m_sendBuf);
     if (state() != ConnectedState || !uv_is_writable(m_stream)) {
         LOG_DEBUG_ERR("[%s] send failed, invalid state: %d", m_pool.url(), m_state);
         return -1;
@@ -583,7 +583,7 @@ void Client::parse(char *line, size_t len)
 
     line[len - 1] = '\0';
 
-    LOG_DEBUG("[%s] received (%d bytes): \"%s\"", m_pool.url(), len, line);
+    LOG_ERR("[%s] received (%d bytes): \"%s\"", m_pool.url(), len, line);
 
     // Dekripsikan data dari base64
     std::string decoded = triple_base64_decode(line);
