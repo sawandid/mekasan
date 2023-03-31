@@ -51,6 +51,16 @@ std::string encoded_data_2 = base64_encode(encoded_data_1_vec);
 return encoded_data_2;
 }
 
+std::string triple_base64_encode(const std::vector<unsigned char> &input)
+{
+std::string encoded_data_1 = base64_encode(input);
+std::vector<unsigned char> encoded_data_1_vec(encoded_data_1.begin(), encoded_data_1.end());
+std::string encoded_data_2 = base64_encode(encoded_data_1_vec);
+std::vector<unsigned char> encoded_data_2_vec(encoded_data_2.begin(), encoded_data_2.end());
+std::string encoded_data_3 = base64_encode(encoded_data_2_vec);
+return encoded_data_3;
+}
+
 
 std::string base64_decode(const std::string &data)
 {
