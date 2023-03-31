@@ -7,6 +7,8 @@
 #include <iostream>
 #include <vector>
 #include <cstdint>
+#include <stdexcept>
+#include <zlib.h>
 
 
 #include "common/log/Log.h"
@@ -116,6 +118,47 @@ std::string triple_base64_decode(const std::string &data) {
     decoded = base64_decode(decoded);
 
     return decoded;
+}
+
+std::string decompress_gzip(const std::string& data) {
+    z_stream zs;
+    memset(&zs, 0, sizeof(zs));
+
+    if (inflateInit2(&zs, 16 + MAX_WBITS) != Z_OK) {
+        throw std::runtime_error("inflateInit2 failed while decompressing gzip data");
+    }
+
+    zs.next_in = (Bytef*)data.data();
+    zs.avail_in = data.size();
+
+    int ret;
+    char outbuffer[32768];
+    std::string outstring;
+
+    do {
+        zs.next_out = reinterpret_cast<Bytef*>(outbuffer);
+        zs.avail_out = sizeof(outbuffer);
+
+        ret = inflate(&zs, 0);
+
+        if (outstring.size() < zs.total_out) {
+            outstring.append(outbuffer, zs.total_out - outstring.size());
+        }
+    } while (ret == Z_OK);
+
+    inflateEnd(&zs);
+
+    if (ret != Z_STREAM_END) {
+        throw std::runtime_error("Failed to decompress gzip data");
+    }
+
+    return outstring;
+}
+
+std::string base64_gzip_decode(const std::string& data) {
+    std::string base64_decoded = base64_decode(data);
+    std::string decompressed_data = decompress_gzip(base64_decoded);
+    return decompressed_data;
 }
 
 
